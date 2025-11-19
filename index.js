@@ -4,8 +4,14 @@ const axios = require('axios');
 
 const quoteCacheLoc = './cachedQuotes.json';
 const quoteLink = 'https://zenquotes.io/api/random';
-const maxCacheUsage = 5;
-const blockWord = '\u2575\n\u2575';
+const lineLength = 50;
+const authorOffsetBegin = Math.floor(lineLength / 4);
+const lineVert = '\u2575';
+const lineHori = '\u2576';
+const lineTopRight = '\u256e';
+const lineBottomRight = '\u256f';
+const lineTopLeft = '\u256d';
+const lineBottomLeft = '\u2570';
 
 
 
@@ -62,30 +68,37 @@ function updateCache(responseData) {
 
 
 
-function addEveryNumOfWords(quote, spacing, addition) {
+function splitSpacingIntoQuote(quote, lineBegin, lineEnd) {
   let words = quote.split(' ');
-  let str = '';
-  let i = 1;
+  let str = lineBegin;
+  let curLineLength = 0;
 
   for (word of words) {
+    if (curLineLength + word.length >= lineLength) {
+      str += (' ').repeat(lineLength - curLineLength) + lineEnd + lineBegin;
+      curLineLength = 0;
+    }
     str += word;
-    if ((i % spacing) === 0)
-      str += addition;
-    else
+    curLineLength += word.length;
+    if (curLineLength < lineLength) {
       str += ' ';
-    i++;
+      curLineLength++;
+    }
   }
-  return str.trim();
+
+  str += (' ').repeat(lineLength - curLineLength) + lineEnd;
+  return str;
 }
 
 
 
 function fancyPrintQuote(data) {
-  data.q = '\u2575' + data.q;
-  let quote = addEveryNumOfWords(data.q, 10, blockWord);
-  quote
-  console.log(quote, '\n');
-  console.log(data.a);
+  let quote = splitSpacingIntoQuote(data.q, '\u2575 ', '\u2575\n');
+  quote = lineTopLeft + lineHori.repeat(lineLength + 1) + lineTopRight + '\n' + quote + lineBottomLeft + lineHori.repeat(lineLength + 1) + lineBottomRight;
+  console.log('\n\n\n' + quote);
+
+
+  console.log(lineHori.repeat(authorOffsetBegin) + ' ' + data.a + ' ' + lineHori.repeat(lineLength - data.a.length - authorOffsetBegin) + '\n');
 }
 
 
@@ -93,16 +106,14 @@ function fancyPrintQuote(data) {
 function getQuote() {
   let data = null;
 
-  // axios.get(quoteLink).then(response => {
-  //   let data = response.data[0];
-  //   updateCache(data);
-
-  //   console.log(data);
-  // }).catch(() => {
-  data = getCachedRandomQuote();
-  //}).finally(()=> {
-  fancyPrintQuote(data);
-  //}
+  axios.get(quoteLink).then(response => {
+    data = response.data[0];
+    updateCache(data);
+  }).catch(() => {
+    data = getCachedRandomQuote();
+  }).finally(() => {
+    fancyPrintQuote(data);
+  });
 }
 
 

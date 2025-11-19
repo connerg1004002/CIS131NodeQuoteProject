@@ -6,7 +6,6 @@ const quoteCacheLoc = './cachedQuotes.json';
 const quoteLink = 'https://zenquotes.io/api/random';
 const lineLength = 50;
 const authorOffsetBegin = Math.floor(lineLength / 4);
-const lineVert = '\u2575';
 const lineHori = '\u2576';
 const lineTopRight = '\u256e';
 const lineBottomRight = '\u256f';

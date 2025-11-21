@@ -3,7 +3,7 @@
  
 ## Pulling
 * First an attempt is made to get a single random quote from the API 
-* There is a cached block of 50 quotes that does a rolling update loop as successful quotes are pulled from the API.
+* There is a cached block of 50 quotes that does a looping update as successful quotes are pulled from the API.
 * If a pull is not successful a random quote is taken from the cache.
 
 
